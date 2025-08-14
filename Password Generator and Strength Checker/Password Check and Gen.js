@@ -16,32 +16,14 @@ function hasCapitalLetter(str) {
 /* Determines the strength of the password*/
 function checkPasswordStrength(password) {
   let passwordStrength = 0;
-
-const strengthBar = document.getElementById("strengthBar");
-let barWidth = 0;
-let barColor = "red";
-
-if (aa123 === "Weak") {
-    barWidth = 33;
-    barColor = "red";
-} else if (aa123 === "Medium") {
-    barWidth = 66;
-    barColor = "orange";
-} else if (aa123 === "Strong") {
-    barWidth = 100;
-    barColor = "green";
+if (password.length > 9) {
+  passwordStrength += 4;
+} else if (password.length > 6) {
+  passwordStrength += 2;
+} else if (password.length > 3) {
+  passwordStrength += 1;
 }
 
-strengthBar.style.width = barWidth + "%";
-strengthBar.style.backgroundColor = barColor;
-
-  if (password.length > 9) {
-    passwordStrength += 4;
-  } else if (password.length > 6) {
-    passwordStrength += 3;
-  } else if (password.length > 3) {
-    passwordStrength += 1;
-  }
 
   if (numbers.split('').some(num => password.includes(num))) {
     passwordStrength += 2;
@@ -70,7 +52,26 @@ strengthBar.style.backgroundColor = barColor;
     aa123 = "Medium";
   } else if (passwordStrength >= 7) {
     aa123 = "Strong";
-  }
+  } 
+  
+const strengthBar = document.getElementById("strengthBar");
+let barWidth = 0;
+let barColor = "red";
+
+if (aa123 === "Weak") {
+    barWidth = 33;
+    barColor = "red";
+} else if (aa123 === "Medium") {
+    barWidth = 66;
+    barColor = "orange";
+} else if (aa123 === "Strong") {
+    barWidth = 100;
+    barColor = "green";
+}
+
+strengthBar.style.width = barWidth + "%";
+strengthBar.style.backgroundColor = barColor;
+
 
   return passwordStrength;
 }
@@ -79,27 +80,35 @@ function generateStrongPassword(length = 12) {
   let numbersCheck = document.getElementById('Number');
   let symbolsCheck = document.getElementById('Symbol');
   let capitalsCheck = document.getElementById('Capital');
-  let password = '';
-  //let characters = numbers + symbols + upperCase + lowerCase;
+    //let characters = numbers + symbols + upperCase + lowerCase;
     let char = lowerCase;
-
+    let reqChar = [];
     if (numbersCheck.checked) {
       char += numbers;
+      reqChar.push(numbers[Math.floor(Math.random() * numbers.length)]);
     }
 
     if (symbolsCheck.checked) {
       char += symbols;
+      reqChar.push(symbols[Math.floor(Math.random() * symbols.length)]);
     }
 
     if (capitalsCheck.checked) {
       char += upperCase;
-    }
-
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * char.length);
-    password += char[randomIndex];
+      reqChar.push(upperCase[Math.floor(Math.random() * upperCase.length)]);
   }
-  return password;
+  let remainingLength = length - reqChar.length;
+  let password = reqChar;
+  for (let i = 0; i < remainingLength; i++) {
+    const randomIndex = Math.floor(Math.random() * char.length);
+    password.push(char[randomIndex]);
+  }
+
+  for (let i = password.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [password[i], password[j]] = [password[j], password[i]];
+  }
+  return password.join('');
 }
 
 
@@ -126,6 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
   generatePass.addEventListener("click", () => {
     const generatedPass = generateStrongPassword(12);
     passwordInput.value = generatedPass;
+
 
     checkPasswordStrength(generatedPass);
     strengthDisplay.textContent = aa123;
